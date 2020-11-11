@@ -1,0 +1,120 @@
+import java.io.IOException;
+import java.util.Scanner;
+
+class Main {
+  public static void main(String[] args) {
+    int[][] board = new int[7][6];//[colum][row]
+    // default is 0, P1's mark is 1, P2's mark is 2 on the array
+    boolean player=true;
+    printBoard(board);
+    do{
+      board = place(board, player);
+      clear();
+      printBoard(board);
+      if(checkwin(board,player)!= 0){
+        System.out.println("player x won");
+        break;
+      }
+      if(player) player = false;
+      else player = true;
+
+    }while(true);
+  }
+
+  // -  - -- -- - -  - - -- -  -- - - - - - - - - - - - --- - -  - - -
+
+  public static void printBoard(int[][] board){
+    int nc = board.length;
+    int nr = board[0].length;
+    for(int i = -1; i < nr; i++){//row
+      for(int j = 0; j < nc; j++){//column
+        if(i < 0){
+          System.out.print(" "+(j+1));
+        }
+        else{
+        System.out.print("|");
+        if(board[j][i] == 1) System.out.print("█");
+        else if(board[j][i] == 2) System.out.print("░");
+        else System.out.print(" ");
+        }
+      }
+      System.out.println("|");
+    }
+  }
+
+  // -- - - - - -  - - - - - --  - -- - -  - -- - - - -  - - -
+ 
+  public static int[][] place (int[][] board, boolean p){
+    Scanner s = new Scanner(System.in);
+    boolean b = false;
+    int response;
+    int lowest = 0;
+    do{
+      b = false;
+      System.out.print("Choose a column between 1 and 7 to place piece: ");
+      response = s.nextInt()-1; s.nextLine();
+      if(response < 0 || response > 6){
+        System.out.println("BETWEEN 1 and 7!");
+        b = true;
+      }
+      else if(board[response][0]!=0){
+        System.out.println("That column is full!");
+        b = true;
+      }
+    }while(b);
+
+    for(int i = 5; i >= 0; i--){//drop check
+      if(board[response][i] == 0){
+        lowest = i;
+        break;
+      }
+    }
+
+    if(p){
+      board[response][lowest] = 1;
+    }
+    else board[response][lowest] = 2;
+    return board;
+  }
+
+  //-- - - - - - - - - - - - - - - - 
+  public static int checkwin(int[][] board, boolean p){ //return 0 if no win, return 1 if p1 win, return 2 if p2 win
+    int pn;
+    if(p) pn = 1;
+    else pn = 2;
+    int c = 0;
+    int nc = board.length;
+    int nr = board[0].length;
+
+    //vertical check win
+    for(int i = 0; i < nc; i++){//colum = i
+      for(int j = nr-1; j >= 0; j--){//row = j
+        if(board[i][j] == pn){
+          c++;
+          if(c >= 4) return pn;
+        }
+        else c = 0;
+      }
+      if(i-1 >= 0){// i-1 becomes nr
+        for(int j = 0; j < nc; j++){
+          if(board[j][i-1] == pn){
+           c++;
+           if(c >= 4) return pn;
+          }
+          else c = 0;
+        }
+      }
+    }
+
+
+
+
+
+    return 0;
+  }
+
+  public static void clear() {   
+    System.out.print("\033[H\033[2J");   
+    System.out.flush();   
+  }
+}
